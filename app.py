@@ -1,6 +1,7 @@
 import ollama
 from my_piper_tts import VoiceSession, generate_voice
-from piper_voice_model import get_voice_by_name, get_voice_names
+from piper_voice_model import get_voice_names
+from typing import Any, cast, Dict
 
 # Ollama Gemma Models
 gemma4_e4b = 'gemma4:e4b'               # Full e4b model
@@ -87,7 +88,8 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         assistant_response = '' # Full response
         response_part = ''      # Part of the full response
         for chunk in response_data:
-            content = chunk['message']['content'] # type: ignore
+            chunk_dict = cast(Dict[str, Any], chunk)
+            content = chunk_dict['message']['content']
             content = content.replace('*','')
             assistant_response += content
             response_part += content
@@ -97,17 +99,18 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
                 response_part = ''
         print('')
     else:
-        assistant_response = response_data['message']['content'] # type: ignore
+        response_dict = cast(Dict[str, Any], response_data)
+        assistant_response = response_dict['message']['content']
         print(assistant_response)
         generate_voice(assistant_response, voice_session) 
         
     return assistant_response
 
 def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> str:
-    welcome_msg_fr = f"Tu es un assistant IA nommé {voice_session.model.name}, ceci est ton tout premier message. tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également."
-    welcome_msg_en = f"You are an AI assistant named {voice_session.model.name}. This is your very first message; briefly welcome the user in one sentence and ask him how you can help him in one short sentence too."
+    welcome_msg_fr = f"Tu es un assistant IA nommé {getattr(voice_session.model, 'name')}, ceci est ton tout premier message. tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également."
+    welcome_msg_en = f"You are an AI assistant named {getattr(voice_session.model, 'name')}. This is your very first message; briefly welcome the user in one sentence and ask him how you can help him in one short sentence too."
     
-    if voice_session.model.lang =='fr':
+    if getattr(voice_session.model, 'lang') =='fr':
         print("[Système] Chargement du modèle de langage, veuillez patienter ... \n")
         generate_voice("Chargement du modèle de langage, veuillez patienter ...")
         welcome_msg = [{'role': 'system','content': welcome_msg_fr}]

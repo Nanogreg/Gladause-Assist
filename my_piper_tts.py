@@ -15,8 +15,8 @@ class VoiceSession:
         if(self.model):
             try:
                 self.onnx_model = PiperVoice.load(Path('voices') / self.model.file_name)
-            except(e):
-                print('❌ Error loading the model : '+e)
+            except Exception as e:
+                print(f'❌ Error loading the model : {e}')
         else:
             print('❌ Error : the model '+voice_name+' is not found')
                 
@@ -33,7 +33,7 @@ def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
 
     # Record in virtual WAV
     with wave.open(wav_buffer, "wb") as wav_file:
-        voice_session.onnx_model.synthesize_wav(text, wav_file, syn_config=voice_session.model.config)
+        voice_session.onnx_model.synthesize_wav(text, wav_file, syn_config=getattr(voice_session.model, 'config'))
 
     # Resetting the buffer to the start
     wav_buffer.seek(0)
