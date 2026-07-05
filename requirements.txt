@@ -1,0 +1,19 @@
+# --- NOTES --- #
+# Python 3.11 is required for this piper-tts release
+# python3.11 -m venv .venv311 (linux/osx)
+# source .venv311/bin/activate (linux/osx)
+
+# Linux needs portaudio for sounddevice playback :
+# Ubuntu : 
+# sudo apt-get update
+# sudo apt-get install libportaudio2
+# Fedora :
+# sudo dnf install portaudio
+
+# Require Ollama application localy and models download
+
+# --- REQUIREMENTS --- #
+piper-tts == 1.4.2
+sounddevice == 0.5.5
+numpy == 2.4.6
+ollama == 0.6.2
