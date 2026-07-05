@@ -13,10 +13,13 @@ class VoiceSession:
     def __init__ (self, voice_name: str = 'Gladause'):
         self.model = get_voice_by_name(voice_name)
         if(self.model):
-            self.onnx_model = PiperVoice.load(Path('voices') / self.model.file_name)
+            try:
+                self.onnx_model = PiperVoice.load(Path('voices') / self.model.file_name)
+            except(e):
+                print('❌ Error loading the model : '+e)
         else:
-            self.onnx_model = None
-
+            print('❌ Error : the model '+voice_name+' is not found')
+                
 def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
     """Generate a voice with text input and with a chosen voice name corresponding to a PiperVoiceModel
 

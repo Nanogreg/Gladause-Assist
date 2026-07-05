@@ -2,13 +2,17 @@ import ollama
 from my_piper_tts import VoiceSession, generate_voice
 from piper_voice_model import get_voice_by_name, get_voice_names
 
-# Model list
+# Ollama Gemma Models
 gemma4_e4b = 'gemma4:e4b'               # Full e4b model
 gemma4_e4b_q4 = 'batiai/gemma4-e4b:q4'  # e4b quantized Q4 (faster)
 gemma4_e4b_q6 = 'batiai/gemma4-e4b:q6'  # e4b quantized Q6
 gemma4_uncensored = """
 mdhm_hmmd/gemma4-e4b-uncensored-q8"""   # e4b uncensored quantized Q8
 gemma4_9b = 'gemma2:9b'                 # Bigger 9b model (slower)
+
+# System configuration for text generation
+cpu_cores = 8       # Numer of CPU cores
+gpu_offload = 10    # GPU offload : 0 - 99
 
 def start_conversation(voice_name: str = 'Gladause', stream_conv: bool = True, llm_model_name: str = 'batiai/gemma4-e4b:q4'):
     """Starts a conversation between the user and the AI with text + speach response using Gemma4 and Piper-tts.
@@ -49,13 +53,11 @@ def start_conversation(voice_name: str = 'Gladause', stream_conv: bool = True, l
             'role': 'user', 
             'content': user_prompt
         })
-        
-        assistant_response = process_prompt(messages, llm_model_name, voice_session, stream_conv)
 
         # Adding assistant response to the conv history
         messages.append({
             'role': 'assistant',
-            'content': assistant_response
+            'content': process_prompt(messages, llm_model_name, voice_session, stream_conv)
         })
         
         user_prompt = input(f'\n[{user}] ').strip()
@@ -68,13 +70,13 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         think=False,
         stream=stream_conv,
         options={
-            'num_ctx': 2048,    # Reduces memory overhead significantly
-            'num_predict': 512, # Limits maximum length of the response
-            'num_thread': 8,    # CPU cores
-            'num_gpu' : 10      # Offload to gpu
+            'num_ctx': 2048,            # Reduces memory overhead significantly
+            'num_predict': 512,         # Limits maximum length of the response
+            'num_thread': cpu_cores,    # CPU cores
+            'num_gpu' : gpu_offload     # Offload to gpu
         },
     )
-
+    # Printing assistant name
     print(f'\n[{voice_name}] ', end='')
 
     if(stream_conv):
