@@ -32,8 +32,8 @@ def get_voices() -> list[PiperVoiceModel]:
         config = SynthesisConfig(
             volume = 1.0,           # Loudness default 1.0
             length_scale = 1.0,     # Speed default 1.0
-            noise_scale = 0.0,      # more audio variation defult 0.667
-            noise_w_scale = 1.4,    # more speaking variation default 0.8
+            noise_scale = 0.3,      # more audio variation defult 0.667
+            noise_w_scale = 1.32,    # more speaking variation default 0.8
             normalize_audio = False,# use raw audio from voice
         )
     ))

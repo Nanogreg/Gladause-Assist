@@ -36,10 +36,14 @@ def start_conversation(voice_name: str = 'Gladause', stream_conv: bool = True, l
     user = 'Moi' if voice_session.model.lang == 'fr' else 'Me'
     
     # Welcome msg
-    generate_welcome_msg(voice_session, llm_model_name)
+    welcome_msg = generate_welcome_msg(voice_session, llm_model_name)
 
     # First conversaion history with system role
     messages = [{'role': 'system','content': voice_session.model.personality}]
+    messages.append({
+        'role': 'assistant',
+        'content': welcome_msg
+    })
 
     # First prompt out of the loop to handle quit at 1st msg
     user_prompt = input(f'\n[{user}] ').strip()
@@ -99,12 +103,12 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         
     return assistant_response
 
-def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ):
+def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> str:
     welcome_msg_fr = f"Tu es un assistant IA nommé {voice_session.model.name}, ceci est ton tout premier message. tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également."
     welcome_msg_en = f"You are an AI assistant named {voice_session.model.name}. This is your very first message; briefly welcome the user in one sentence and ask him how you can help him in one short sentence too."
     
     if voice_session.model.lang =='fr':
-        print("Chargement du modèle de langage, veuillez patienter ... \n")
+        print("[Système] Chargement du modèle de langage, veuillez patienter ... \n")
         generate_voice("Chargement du modèle de langage, veuillez patienter ...")
         welcome_msg = [{'role': 'system','content': welcome_msg_fr}]
     else:
@@ -112,7 +116,7 @@ def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ):
         generate_voice("Loading language model ...")
         welcome_msg = [{'role': 'system','content': welcome_msg_en}]
         
-    process_prompt(welcome_msg, llm_model_name, voice_session, False)
+    return process_prompt(welcome_msg, llm_model_name, voice_session, False)
 
 # Setup and starts the conversation    
 if __name__ == "__main__": 

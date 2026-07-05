@@ -47,7 +47,7 @@ def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
     audio_data = numpy.frombuffer(audio_bytes, dtype=numpy.int16)
 
     # blocksize flux stabilization (ex: 2048 or 4096)
-    sounddevice.play(audio_data, samplerate=samplerate, blocksize=2048)
+    sounddevice.play(audio_data, samplerate=samplerate, blocksize=4096)
     sounddevice.wait()
     
     # Save to wav file code
