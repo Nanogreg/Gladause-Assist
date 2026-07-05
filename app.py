@@ -4,11 +4,11 @@ from piper_voice_model import get_voice_by_name, get_voice_names
 
 # Model list
 gemma4_e4b = 'gemma4:e4b'               # Full e4b model
-gemma4_e4b_q4 = 'batiai/gemma4-e4b:q4'  # e4b quantized Q4
+gemma4_e4b_q4 = 'batiai/gemma4-e4b:q4'  # e4b quantized Q4 (faster)
 gemma4_e4b_q6 = 'batiai/gemma4-e4b:q6'  # e4b quantized Q6
 gemma4_uncensored = """
 mdhm_hmmd/gemma4-e4b-uncensored-q8"""   # e4b uncensored quantized Q8
-gemma4_9b = 'gemma2:9b'
+gemma4_9b = 'gemma2:9b'                 # Bigger 9b model (slower)
 llm_model_name: str                     # Used model
 
 def start_conversation(voice_model: str = 'Gladause', stream_conv: bool = True):
