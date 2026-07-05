@@ -2,13 +2,15 @@
 
 To use these voices with the assistant, you must download **both** the `.onnx` model file and its corresponding `.json` configuration file.
 
+The default `fr_FR-glados-medium.onnx` and JSON are provided.
+
 ---
 
 ## 📦 Default Voices
 
 The project is pre-configured to look for and support the following French voice models:
 
-* **GLaDOS:** `fr_FR-glados-medium.onnx`
+* **GLaDOS:** `fr_FR-glados-medium.onnx` -> included
 * **Siwis:** `fr_FR-siwis-medium.onnx`
 * **Tom:** `fr_FR-tom-medium.onnx`
 * **UPMC:** `fr_FR-upmc-medium.onnx`

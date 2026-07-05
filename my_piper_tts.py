@@ -3,23 +3,34 @@ from piper import PiperVoice
 from piper_voice_model import get_voice_by_name
 from pathlib import Path
 
-def generate_voice(text: str, voice_name: str = 'Gladause'):
+class VoiceSession:
+    """A VoiceSession object is keeping the custom voice model (PiperVoiceModel) and onnx model in memory.
+
+    Attributes:
+        voice_name (str): The name of the voice model to use. Default to 'Gladause'
+        onnx_model : The onnx model is loaded automaticly according to the voice name provided.
+    """
+    def __init__ (self, voice_name: str = 'Gladause'):
+        self.model = get_voice_by_name(voice_name)
+        if(self.model):
+            self.onnx_model = PiperVoice.load(Path('voices') / self.model.file_name)
+        else:
+            self.onnx_model = None
+
+def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
     """Generate a voice with text input and with a chosen voice name corresponding to a PiperVoiceModel
 
     Args:
         text (str): text to be spoken
-        voice_name (str, optional): The name of the PiperVoiceModel to use. Defaults to 'Gladause'.
+        voice_session (str, optional): the voice sesion for the generation. Defaults to 'Gladause'.
     """
-    
-    voice_model = get_voice_by_name(voice_name)
-    voice = PiperVoice.load(Path('voices') / voice_model.file_name)
 
     # Virtual WAV file (in RAM)
     wav_buffer = io.BytesIO()
 
     # Record in virtual WAV
     with wave.open(wav_buffer, "wb") as wav_file:
-        voice.synthesize_wav(text, wav_file, syn_config=voice_model.config)
+        voice_session.onnx_model.synthesize_wav(text, wav_file, syn_config=voice_session.model.config)
 
     # Resetting the buffer to the start
     wav_buffer.seek(0)
