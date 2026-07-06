@@ -12,11 +12,15 @@ class VoiceSession:
     """
     def __init__ (self, voice_name: str = 'Gladause'):
         self.model = get_voice_by_name(voice_name)
-        if(self.model):
-            try:
-                self.onnx_model = PiperVoice.load(Path('voices') / self.model.file_name)
-            except Exception as e:
-                print(f'❌ Error loading the model : {e}')
+        if self.model:
+            file_path = Path('voices') / self.model.file_name
+            if not file_path.is_file():
+                print(f'❌ Error : model file not found ({file_path})')
+            else:
+                try:
+                    self.onnx_model = PiperVoice.load(file_path)
+                except Exception as e:
+                    print(f'❌ Error : Impossible to load the model : {e}')
         else:
             print('❌ Error : the model '+voice_name+' is not found')
                 
@@ -27,13 +31,12 @@ def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
         text (str): text to be spoken
         voice_session (str, optional): the voice sesion for the generation. Defaults to 'Gladause'.
     """
-
     # Virtual WAV file (in RAM)
     wav_buffer = io.BytesIO()
 
     # Record in virtual WAV
     with wave.open(wav_buffer, "wb") as wav_file:
-        voice_session.onnx_model.synthesize_wav(text, wav_file, syn_config=getattr(voice_session.model, 'config'))
+        voice_session.onnx_model.synthesize_wav(normalize_text_for_audio(text, voice_session), wav_file, syn_config=getattr(voice_session.model, 'config'))
 
     # Resetting the buffer to the start
     wav_buffer.seek(0)
@@ -53,6 +56,22 @@ def generate_voice(text: str, voice_session: VoiceSession = VoiceSession()):
     # Save to wav file code
     # with wave.open("test.wav", "wb") as wav_file:
     #    voice.synthesize_wav("Bonjour, ceci est un test", wav_file, syn_config=syn_config)
+    
+def normalize_text_for_audio(text: str, voice_session: VoiceSession) -> str:
+    
+    # Gladaus(en) have trouble with hello
+    if(voice_session.model and voice_session.model.name == 'Gladaus'):
+        text = text.replace('Hello', '[[ h ɛ l ˈ oʊ ː ]] ')
+    # And Hi
+    if(voice_session.model and voice_session.model.name == 'Gladaus' and text.startswith('Hi')):
+        text.replace('Hi', '[[ h ˈ aɪ ː ]]', 1)
+    
+    # Replacing ! with . and replacing .. or ... with .
+    text = text.replace('!', '.').replace('..', '.').replace('...','.')
+    
+    # TODO removes emoji
+    
+    return text
     
 
 if __name__ == "__main__":
