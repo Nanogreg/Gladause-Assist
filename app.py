@@ -14,8 +14,8 @@ gemma4_9b = 'gemma2:9b'                 # Bigger 9b model (slow)
 default_llm_model = gemma4_e4b_q4
 
 # System configuration for text generation
-cpu_cores = 8       # Numer of CPU cores
-gpu_offload = 10    # GPU offload : 0 - 99
+cpu_cores = 8       # Your number of physical CPU cores
+gpu_offload = 0    # GPU offload : 0 = auto (ollama)
 
 def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, llm_model_name: str = default_llm_model):
     """Starts a conversation between the user and the AI with text + speach response using Gemma4 and Piper-tts.
@@ -37,11 +37,11 @@ def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, ll
     welcome_msg = generate_welcome_msg(voice_session, llm_model_name)
 
     # First conversaion history with system role
-    messages = [{'role': 'system','content': voice_session.model.personality}]
-    messages.append({
+    system_prompt = [{'role': 'system','content': voice_session.model.personality}]
+    messages = system_prompt + [{
         'role': 'assistant',
         'content': welcome_msg
-    })
+    }]
 
     # First prompt out of the loop to handle quit at 1st msg
     user_prompt = input(f'\n[{user}] ').strip()
@@ -56,10 +56,13 @@ def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, ll
             'content': user_prompt
         })
 
+        # The assistant only takes the last 20 messages history (1 to 21) to not overload the memory
+        new_msg = process_prompt(system_prompt + messages[1:][-21:], llm_model_name, voice_session, stream_conv)
+
         # Adding assistant response to the conv history
         messages.append({
             'role': 'assistant',
-            'content': process_prompt(messages, llm_model_name, voice_session, stream_conv)
+            'content': new_msg
         })
         
         user_prompt = input(f'\n[{user}] ').strip()
@@ -72,8 +75,8 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         think=False,
         stream=stream_conv,
         options={
-            'num_ctx': 2048,            # Reduces memory overhead significantly
-            'num_predict': 512,         # Limits maximum length of the response
+            'num_ctx': 8192,            # Reducing this reduces memory overhead significantly
+            'num_predict': -1,          # Limits maximum length of the response
             'num_thread': cpu_cores,    # CPU cores
             'num_gpu' : gpu_offload     # Offload to gpu
         },
@@ -150,13 +153,22 @@ def check_llm_model(llm_model: str)-> bool:
         
 
 def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> str:
+    """Generate a welcome message with the welcome_prompt defined in the voice model
+
+    Args:
+        voice_session (VoiceSession): the voice to use
+        llm_model_name (str): llm name to use
+
+    Returns:
+        str: the welcome message by assistant
+    """
     # Loading message by language
     if getattr(voice_session.model, 'lang') =='fr':
         print("[Gladause] Chargement du modèle de langage, veuillez patienter ... \n")
-        generate_voice("Chargement du modèle de langage, veuillez patienter ...", VoiceSession('Gladause')) # Default voice -> Gladause = fr version
+        generate_voice("Chargement du modèle de langage, veuillez patienter ...", VoiceSession('Gladause')) # Gladause = fr version
     elif getattr(voice_session.model, 'lang') =='en':
         print("[Gladaus] Loading language model into memory, please wait ... \n")
-        generate_voice("Loading language model into memory, please wait ...") # Gladaus = en version
+        generate_voice("Loading language model into memory, please wait ...") # Default voice -> Gladaus = en version
 
     # First welcome message of the assistant
     welcome_msg = [{'role': 'system','content': getattr(voice_session.model, 'welcome_prompt')}]
