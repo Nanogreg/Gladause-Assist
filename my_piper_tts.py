@@ -7,10 +7,10 @@ class VoiceSession:
     """A VoiceSession object is keeping the custom voice model (PiperVoiceModel) and onnx model in memory.
 
     Attributes:
-        voice_name (str): The name of the voice model to use. Default to 'Gladause'
+        voice_name (str): The name of the voice model to use. Default to 'Gladaus'(en)
         onnx_model : The onnx model is loaded automaticly according to the voice name provided.
     """
-    def __init__ (self, voice_name: str = 'Gladause'):
+    def __init__ (self, voice_name: str = 'Gladaus'):
         self.model = get_voice_by_name(voice_name)
         if self.model:
             file_path = Path('voices') / self.model.file_name

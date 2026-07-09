@@ -17,18 +17,18 @@ default_llm_model = gemma4_e4b_q4
 cpu_cores = 8       # Numer of CPU cores
 gpu_offload = 10    # GPU offload : 0 - 99
 
-def start_conversation(voice_name: str = 'Gladause', stream_conv: bool = True, llm_model_name: str = default_llm_model):
+def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, llm_model_name: str = default_llm_model):
     """Starts a conversation between the user and the AI with text + speach response using Gemma4 and Piper-tts.
 
     Args:
         stream_conv (bool, optional): Specify if the text and voice are generated in one block or streamed. Defaults to True.
-        voice_model (str, optional): Voice model name to use (see: piper_voice_model.py). Defaults to 'Gladause'.
+        voice_model (str, optional): Voice model name to use (see: piper_voice_model.py). Defaults to 'Gladaus'(en).
     """
     # Getting the voice model
     voice_session = VoiceSession(voice_name)
     if not voice_session.model:
-        print(f"Error getting the voice : {voice_name}\n=== Exit ===")
-        generate_voice("Erreur de chargement de la configuration.")
+        print(f"[Gladaus] Error getting the voice model : {voice_name}\n=== Exit ===")
+        generate_voice("Error : Cannot load the voice model.")
         return
         
     user = 'Moi' if voice_session.model.lang == 'fr' else 'Me'
@@ -127,17 +127,17 @@ def check_llm_model(llm_model: str)-> bool:
                 # Waiting for download message text + voice
                 print(f"[Gladaus] Attempting to download '{llm_model}', please wait...")
                 print("[System] ⚠️This process can take a while depending on your internet connection.")
-                generate_voice("Attempting to download language model, please wait.", VoiceSession('Gladaus'))
+                generate_voice("Attempting to download language model, please wait.")
                 
                 ollama.pull(llm_model)
                 
                 # Model loaded message text + voice
                 print(f"[Gladaus] LLM '{llm_model}' downloaded.")
-                generate_voice("Large language model downloaded successfully.", VoiceSession('Gladaus'))
+                generate_voice("Large language model downloaded successfully.")
                 
             except ollama.ResponseError as e:
                 print(f"\n[Gladaus] Error : the selected language model was not found. Download failed.")
-                generate_voice("Error : the selected language model was not found. Download failed.", VoiceSession('Gladaus'))
+                generate_voice("Error : the selected language model was not found. Download failed.")
                 return False
             
         return True
@@ -145,22 +145,21 @@ def check_llm_model(llm_model: str)-> bool:
     except Exception as e:
         print("[System] ⚠️ Download and run ollama server first.")
         print("[Gladaus] Error: Cannot connect to Ollama. Is the server running?")
-        generate_voice("Error : Cannot connect to Ollama. Is the server running?", VoiceSession('Gladaus'))
+        generate_voice("Error : Cannot connect to Ollama. Is the server running?")
         return False
         
 
 def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> str:
-    welcome_msg_fr = f"Tu es un assistant IA nommé {getattr(voice_session.model, 'name')}, ceci est ton tout premier message. tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également."
-    welcome_msg_en = f"You are an AI assistant named {getattr(voice_session.model, 'name')}. This is your very first message; briefly welcome the user in one sentence and ask him how you can help him in one short sentence too."
-    
+    # Loading message by language
     if getattr(voice_session.model, 'lang') =='fr':
         print("[Gladause] Chargement du modèle de langage, veuillez patienter ... \n")
-        generate_voice("Chargement du modèle de langage, veuillez patienter ...") # Default voice -> Gladause = fr version
-        welcome_msg = [{'role': 'system','content': welcome_msg_fr}]
-    else:
+        generate_voice("Chargement du modèle de langage, veuillez patienter ...", VoiceSession('Gladause')) # Default voice -> Gladause = fr version
+    elif getattr(voice_session.model, 'lang') =='en':
         print("[Gladaus] Loading language model into memory, please wait ... \n")
-        generate_voice("Loading language model into memory, please wait ...", VoiceSession('Gladaus')) # Gladaus = en version
-        welcome_msg = [{'role': 'system','content': welcome_msg_en}]
+        generate_voice("Loading language model into memory, please wait ...") # Gladaus = en version
+
+    # First welcome message of the assistant
+    welcome_msg = [{'role': 'system','content': getattr(voice_session.model, 'welcome_prompt')}]
         
     return process_prompt(welcome_msg, llm_model_name, voice_session, False)
 
@@ -169,12 +168,13 @@ if __name__ == "__main__":
     try : 
          # Checking if llm is in ollama or try download it
         if(check_llm_model(default_llm_model)):
-            print(f'=== Aviable voice models : {get_voice_names()} ===\n')
+            # Chosing voice model
+            print(f'[System] Aviable voice models : {get_voice_names()} \n')
             voice_name = input("Choice (ENTER for default): ")
         
             if not voice_name:
                 voice_name = 'Gladaus' # Default Gladaus[en]
             print('')
-            start_conversation(voice_name=voice_name, stream_conv=True, llm_model_name=default_llm_model)
+            start_conversation(voice_name=voice_name, llm_model_name=default_llm_model)
     except Exception as e:
-        print(f'❌ Error : {e}')
+        print(f'[System] ❌ Error : {e}')

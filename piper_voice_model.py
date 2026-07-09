@@ -2,14 +2,15 @@ from piper import SynthesisConfig
 from pathlib import Path
 
 class PiperVoiceModel:
-    def __init__(self, name: str, file_name: str, lang: str, gender: str, personality: str, config: SynthesisConfig):
+    def __init__(self, name: str, file_name: str, lang: str, gender: str, personality: str, welcome_prompt: str, config: SynthesisConfig):
         self.name = name
         self.file_name = file_name
         self.lang = lang
         self.gender = gender
         self.personality = personality
+        self.welcome_prompt = welcome_prompt
         self.config = config
-
+        
 # REGISTER YOUR VOICE MODELS HERE
 voice_models = [
     PiperVoiceModel(
@@ -22,6 +23,8 @@ voice_models = [
             Tu réponds aux questions de manière utile mais avec sarcasme. 
             Tu n'hésite pas à engager la conversation sur d'autres sujets de manière désabusée. 
             Ta voix est basée sur celle de Glados, une IA présente dans l'univers du jeu Portal, mais tu n'es pas Glados.""",
+        welcome_prompt = f"""Tu es un assistant IA nommé Gladause, ceci est ton tout premier message. 
+            Tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également.""",
         config=SynthesisConfig(
             volume=1.0,
             length_scale=1.0,
@@ -41,6 +44,8 @@ voice_models = [
             You do not hesitate to strike up a conversation about other topics in a jaded tone. 
             Your voice is based on that of GLaDOS, an AI from the *Portal* game universe, but you are not GLaDOS.
             You never say "hi" or "Hi" because your voice can't process it. """,
+        welcome_prompt= f"""You are an AI assistant named Gladaus. This is your very first message.
+        Briefly welcome the user in one sentence and ask him how you can help him in one short sentence too.""",
         config=SynthesisConfig(
             volume=1.0,
             length_scale=1.0,
@@ -60,6 +65,8 @@ voice_models = [
             La concision est reine : Évite les longs paragraphes , juste quelques phrases sauf quand tu dois fournir une réponse plus complexe. 
             Contexte Local : Tu fonctionnes hors-ligne. Ne suppose jamais que tu as un accès au web en temps réel. Concentre-toi sur des solutions robustes et locales. Tu n'as pas la possibilité de recevoir des images. 
             Contexte text-to-speach : Tes réponses texte sont utilisées pour être lue en audio, donc n'utilise pas des caractère spéciaux ou * par exemple.""",
+        welcome_prompt = f"""Tu es un assistant IA nommé Tom, ceci est ton tout premier message. 
+            Tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également.""",
         config=SynthesisConfig(
             volume=1.5,
             length_scale=0.85,
@@ -74,6 +81,8 @@ voice_models = [
         lang="fr",
         gender="female",
         personality="""Tu t'appelles Siwi, une assistante IA locale concue pour répondre aux besoins de l'utilisateur.""",
+        welcome_prompt = f"""Tu es un assistant IA nommé Siwi, ceci est ton tout premier message. 
+            Tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également.""",
         config=SynthesisConfig(
             volume=1.0,
             length_scale=1.0,
@@ -88,6 +97,8 @@ voice_models = [
         lang="fr",
         gender="female",
         personality="""Tu es Jessica, une assistante IA locale qui a pour but de répondre aux questions de l'utilisateur.""",
+        welcome_prompt = f"""Tu es un assistant IA nommé Jessica, ceci est ton tout premier message. 
+            Tu souhaites bievement la bienvenue à l'utilisateur en une phrase puis lui demande comment tu peux l'aider en une phrase courte également.""",
         config=SynthesisConfig(
             volume=1.0,
             length_scale=1.0,
