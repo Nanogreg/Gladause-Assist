@@ -8,12 +8,13 @@ The default `fr_FR-glados-medium.onnx` and JSON are provided.
 
 ## 📦 Default Voices
 
-The project is pre-configured to look for and support the following French voice models:
+The project is pre-configured to look for and support the following voice models:
 
-* **GLaDOS:** `fr_FR-glados-medium.onnx` -> included
-* **Siwis:** `fr_FR-siwis-medium.onnx`
+* **GLadause:** `fr_FR-glados-medium.onnx` -> included
+* **GLadaus:** `en_US-glados-medium.onnx` -> included
+* **Siwi:** `fr_FR-siwis-medium.onnx`
 * **Tom:** `fr_FR-tom-medium.onnx`
-* **UPMC:** `fr_FR-upmc-medium.onnx`
+* **Jessice(UPMC):** `fr_FR-upmc-medium.onnx`
 
 ---
 

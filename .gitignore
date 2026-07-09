@@ -1,0 +1,9 @@
+__pycache__
+.venv311
+.DS_Store
+
+# Ignore voices models for github
+#fr_FR-glados-medium.onnx
+fr_FR-siwis-medium.onnx
+fr_FR-tom-medium.onnx
+fr_FR-upmc-medium.onnx

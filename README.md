@@ -42,13 +42,7 @@ Before you begin, ensure you have the following installed on your system:
 1. **Python 3.11**: This project specifically requires Python 3.11.
 2. **Ollama**: Required to run the local LLM. 
    * Download and install from [ollama.com](https://ollama.com/).
-3. **Gemma 4 Model**: Once Ollama is installed, open your terminal and pull the model by running:
-```
-ollama run gemma4:e4b
-and/or 
-ollama run batiai/gemma4-e4b:q4
-etc
-```
+3. **Gemma 4 Model**: Downloaded automaticly by Ollama when running the app.
    *(Note: Ensure the Ollama background service is running when using the assistant).*
 
 4. **Linux System - portaudio** : If you are running this project on Linux, you will need to install `portaudio` on your host system to allow the `sounddevice` Python library to playback the generated speech audio:
@@ -90,7 +84,7 @@ With the virtual environment activated, install the required Python packages:
 ### 3. Setup Voices
 🗣️ **Voice Setup Guide:** [voices/voices.md](voices/VOICES.md)
 
-Make sure you have populated the `voices/` directory with your desired Piper-TTS models (both `.onnx` and `.json` files). 
+Two voices are provided : Gladause(fr) and Gladaus(en). If you want other voices, populated the `voices/` directory with your desired Piper-TTS models (both `.onnx` and `.json` files). 
 *Please refer to the `VOICES.md` for download links and voice configuration details.*
 
 ---
