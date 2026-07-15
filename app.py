@@ -1,19 +1,11 @@
 import ollama
+from ollama_llm_model import gemma_models, find_or_pull_llm_model
 from my_piper_tts import VoiceSession, generate_voice
 from piper_voice_model import get_voice_names
 from typing import Any, cast, Dict
 from hardware_config import HardwareConfig
 
-# Ollama Gemma Models
-gemma4_e4b = 'gemma4:e4b'               # Full e4b model
-gemma4_e2b_q4 = 'batiai/gemma4-e2b:q4'  # e2b quantized q4 (fastest)
-gemma4_e4b_q4 = 'batiai/gemma4-e4b:q4'  # e4b quantized Q4 (fast)
-gemma4_e4b_q6 = 'batiai/gemma4-e4b:q6'  # e4b quantized Q6
-gemma4_uncensored = """
-mdhm_hmmd/gemma4-e4b-uncensored-q8"""   # e4b uncensored quantized Q8
-gemma4_9b = 'gemma2:9b'                 # Bigger 9b model (slow)
-default_llm_model = gemma4_e4b_q4
-
+default_llm_model = gemma_models['gemma4_e2b_q4'] #default E2B_Q4 (fastest)
 hardware = HardwareConfig()
 
 def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, llm_model_name: str = default_llm_model):
@@ -55,8 +47,8 @@ def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, ll
             'content': user_prompt
         })
 
-        # The assistant only takes the last 20 messages history (1 to 21) to not overload the memory
-        new_msg = process_prompt(system_prompt + messages[1:][-21:], llm_model_name, voice_session, stream_conv)
+        # The assistant only takes the last 9 messages history (1 to 10) to not overload the memory
+        new_msg = process_prompt(system_prompt + messages[1:][-10:], llm_model_name, voice_session, stream_conv)
 
         # Adding assistant response to the conv history
         messages.append({
@@ -81,7 +73,7 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         },
     )
     # Printing assistant name
-    print(f'\n[{voice_name}] ', end='')
+    print(f'\n[{voice_session.model.name if voice_session.model else None}] ', end='')
 
     if(stream_conv):
         assistant_response = '' # Full response
@@ -105,51 +97,6 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         
     return assistant_response
 
-def check_llm_model(llm_model: str)-> bool:
-    """Check If the LLM model name is aviable in ollama try downloading it. 
-    If ollama is not running or the model is not aviable, raise an error and return false. 
-    
-    Args:
-        llm_model (str): Ollama LLM model name
-
-    Returns:
-        (bool): True if the model is dowloaded locally; False if the model is not downloaded.
-    """
-    try:
-        # List of all aviable models installed locally
-        ollama_response = ollama.list()
-        model_found = False
-
-        for model in ollama_response.models:
-            if model.model == llm_model: model_found = True
-           
-        # If the provided model is not found then try downloading it 
-        if not model_found:
-            try:
-                # Waiting for download message text + voice
-                print(f"[Gladaus] Attempting to download '{llm_model}', please wait...")
-                print("[System] ⚠️This process can take a while depending on your internet connection.")
-                generate_voice("Attempting to download language model, please wait.")
-                
-                ollama.pull(llm_model)
-                
-                # Model loaded message text + voice
-                print(f"[Gladaus] LLM '{llm_model}' downloaded.")
-                generate_voice("Large language model downloaded successfully.")
-                
-            except ollama.ResponseError as e:
-                print(f"\n[Gladaus] Error : the selected language model was not found. Download failed.")
-                generate_voice("Error : the selected language model was not found. Download failed.")
-                return False
-            
-        return True
-    # Ollama server is not running
-    except Exception as e:
-        print("[System] ⚠️ Download and run ollama server first.")
-        print("[Gladaus] Error: Cannot connect to Ollama. Is the server running?")
-        generate_voice("Error : Cannot connect to Ollama. Is the server running?")
-        return False
-        
 
 def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> str:
     """Generate a welcome message with the welcome_prompt defined in the voice model
@@ -178,7 +125,7 @@ def generate_welcome_msg(voice_session: VoiceSession, llm_model_name: str, ) -> 
 if __name__ == "__main__": 
     try : 
          # Checking if llm is in ollama or try download it
-        if(check_llm_model(default_llm_model)):
+        if(find_or_pull_llm_model(default_llm_model)):
             # Chosing voice model
             print(f'[System] Aviable voice models : {get_voice_names()} \n')
             voice_name = input("Choice (ENTER for default): ")

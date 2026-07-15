@@ -1,6 +1,6 @@
-# System configuration for text generation
-
 class HardwareConfig:
+    """ System configuration for text generation """
+    
     default_cpu_cores = 8       # Your number of physical CPU cores
     default_gpu_offload = 0     # GPU offload : 0 = auto (ollama). 99 = max
     default_system_ram = 16     # System ram for CPU generation, VRAM for GPU generation
