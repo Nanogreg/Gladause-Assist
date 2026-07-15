@@ -2,6 +2,7 @@ import ollama
 from my_piper_tts import VoiceSession, generate_voice
 from piper_voice_model import get_voice_names
 from typing import Any, cast, Dict
+from hardware_config import HardwareConfig
 
 # Ollama Gemma Models
 gemma4_e4b = 'gemma4:e4b'               # Full e4b model
@@ -13,9 +14,7 @@ mdhm_hmmd/gemma4-e4b-uncensored-q8"""   # e4b uncensored quantized Q8
 gemma4_9b = 'gemma2:9b'                 # Bigger 9b model (slow)
 default_llm_model = gemma4_e4b_q4
 
-# System configuration for text generation
-cpu_cores = 8       # Your number of physical CPU cores
-gpu_offload = 0    # GPU offload : 0 = auto (ollama)
+hardware = HardwareConfig()
 
 def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, llm_model_name: str = default_llm_model):
     """Starts a conversation between the user and the AI with text + speach response using Gemma4 and Piper-tts.
@@ -75,10 +74,10 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
         think=False,
         stream=stream_conv,
         options={
-            'num_ctx': 8192,            # Reducing this reduces memory overhead significantly
-            'num_predict': -1,          # Limits maximum length of the response
-            'num_thread': cpu_cores,    # CPU cores
-            'num_gpu' : gpu_offload     # Offload to gpu
+            'num_ctx': hardware.num_ctx,        # Reducing this reduces memory overhead significantly
+            'num_predict': -1,                  # Limits maximum length of the response
+            'num_thread': hardware.cpu_cores,   # CPU cores
+            'num_gpu' : hardware.gpu_offload    # Offload to gpu
         },
     )
     # Printing assistant name
