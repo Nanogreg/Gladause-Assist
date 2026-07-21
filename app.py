@@ -1,12 +1,13 @@
 import ollama
-from ollama_llm_model import gemma_models, find_or_pull_llm_model
+from ollama_llm_model import GemmaModels, find_or_pull_llm_model
 from my_piper_tts import VoiceSession, generate_voice
 from piper_voice_model import get_voice_names
 from typing import Any, cast, Dict
 from hardware_config import HardwareConfig
 
-default_llm_model = gemma_models['gemma4_e2b_q4'] #default E2B_Q4 (fastest)
+default_llm_model = GemmaModels.gemma4_e2b_q4 #default E2B_Q4 (fastest)
 hardware = HardwareConfig()
+voice_tts_active = True
 
 def start_conversation(voice_name: str = 'Gladaus', stream_conv: bool = True, llm_model_name: str = default_llm_model):
     """Starts a conversation between the user and the AI with text + speach response using Gemma4 and Piper-tts.
@@ -86,14 +87,16 @@ def process_prompt(messages, llm_model_name: str, voice_session: VoiceSession , 
             response_part += content
             if(response_part and response_part[-1] in ['.', '?', '!',';']): # sentence by sentence voice generation
                 print(response_part, end='', flush=True)
-                generate_voice(response_part, voice_session)
+                if(voice_tts_active):
+                    generate_voice(response_part, voice_session)
                 response_part = ''
         print('')
     else:
         response_dict = cast(Dict[str, Any], response_data)
         assistant_response = response_dict['message']['content']
         print(assistant_response)
-        generate_voice(assistant_response, voice_session) 
+        if(voice_tts_active):
+            generate_voice(assistant_response, voice_session) 
         
     return assistant_response
 

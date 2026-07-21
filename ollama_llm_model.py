@@ -1,13 +1,12 @@
 import ollama
 from my_piper_tts import generate_voice
 
-gemma_models = {
-    'gemma4_e4b': 'gemma4:e4b', #9.6gb
-    'gemma4_e4b_q4': 'batiai/gemma4-e4b:q4', #5.3gb
-    'gemma4_e2b_q4': 'batiai/gemma4-e2b:q4', #3.4gb
-    'gemma4_e4b_q6': 'batiai/gemma4-e4b:q6',
-    'gemma4_e4b_uncensored': 'mdhm_hmmd/gemma4-e4b-uncensored-q8' #8.1gb
-}
+class GemmaModels():
+    gemma4_e4b = 'gemma4:e4b' #9.6gb
+    gemma4_e4b_q4 = 'batiai/gemma4-e4b:q4' #5.3gb
+    gemma4_e2b_q4 = 'batiai/gemma4-e2b:q4' #3.4gb
+    gemma4_e4b_q6 = 'batiai/gemma4-e4b:q6'
+    gemma4_e4b_uncensored = 'mdhm_hmmd/gemma4-e4b-uncensored-q8:latest' #8.1gb
 
 def find_or_pull_llm_model(llm_model: str)-> bool:
     """Check If the LLM model name is aviable in ollama and try downloading it if it's missing. 
